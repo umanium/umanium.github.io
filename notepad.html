@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Online Notepad</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css"/>
+    <style>
+      footer {
+        position:fixed;
+        bottom:0;
+        left:0;
+        width: 100%;
+        text-align: center;
+        padding: 5px;
+        background-color: #e1e1e1;
+        color: #000;
+      }
+      * {
+        font-family: courier;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+  </head>
+
+  <body>
+    <textarea id="my-text-area">Type some **markdown** here to get started.</textarea>
+    <footer>Made with <a href="https://github.com/Ionaru/easy-markdown-editor">EasyMDE</a> and some modifications by me <span class="fa fa-heart"></span></footer>
+    <script>
+      function getCurrentTimestamp() {
+        function zeroPad(num, places) {return String(num).padStart(places, '0')}
+        let now = new Date();
+        return zeroPad(now.getFullYear()) + zeroPad(now.getMonth() + 1, 2) + zeroPad(now.getDay(), 2) + '_' + zeroPad(now.getHours(), 2) + zeroPad(now.getMinutes(), 2) + zeroPad(now.getSeconds(), 2);
+      }
+      // https://gist.github.com/b-rucel/6d7bcddda38d5ea5de8046b722156cd8 with some modifications
+      function saveTextAsFile(text) {
+        let saveUrl = window.URL.createObjectURL(new Blob([text], {type: "text/plain"}));
+
+        let fileName = "note_" + getCurrentTimestamp() + ".md";
+
+        let downloadLink = document.createElement( "a" );
+        downloadLink.download = fileName;
+        downloadLink.innerHTML = "Download File";
+        downloadLink.href = saveUrl;
+        downloadLink.style.display = "none";
+        downloadLink.onclick = function (event) {
+          document.body.removeChild(event.target);
+        };
+
+        document.body.appendChild(downloadLink);
+
+        downloadLink.click();
+      }
+      const easymde = new EasyMDE({
+        element: document.getElementById('my-text-area'),
+        autofocus: true,
+        toolbar: ["bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "code", "|", "link", 
+          {
+            name: "download",
+            action: (editor) => {
+              let textToSave = document.getElementById("my-text-area").value;
+              saveTextAsFile(textToSave);
+            },
+            className: "fa fa-download",
+            title: "Download Text as File",
+          },
+          "|", "guide"
+        ]
+      });
+    </script>
+  </body>
+</html>
